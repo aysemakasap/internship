@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Gmail Clone',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: GmailHomePage(),
@@ -21,58 +21,45 @@ class MyApp extends StatelessWidget {
 class GmailHomePage extends StatelessWidget {
   final List<Email> emails = [
     Email(
-      sender: "Google",
-      subject: "New sign-in from Samsung Galaxy S5",
-      body: "New sign-in from Samsung Galaxy S5",
-      time: "3:35 PM",
+      sender: "Welcome to Gmail",
+      subject: "Lorem ipsum dolor sit amet",
+      body: "Consectetur adipiscing elit. Aenean.",
+      time: "8:00 AM",
       isRead: true,
-      avatarColor: Colors.yellow,
+      avatarColor: Colors.purple,
     ),
     Email(
-      sender: "Social",
-      subject: "Deborah Montague",
-      body: "",
-      time: "1 new",
+      sender: "Important Email",
+      subject: "Lorem ipsum dolor sit amet",
+      body: "Consectetur adipiscing elit. Aenean.",
+      time: "Dec 18",
       isRead: false,
-      avatarColor: Colors.blue,
+      avatarColor: Colors.purple,
     ),
     Email(
-      sender: "Olenna Mason",
-      subject: "Hey girl!",
-      body: "",
-      time: "Jun 24",
-      isRead: false,
-      avatarColor: Colors.lightBlue,
-    ),
-    Email(
-      sender: "Grace Ellington",
-      subject: "Volunteer Opportunity",
-      body: "I would like to inform you of a volunteer...",
-      time: "Jun 21",
-      isRead: false,
-      avatarColor: Colors.pink,
-    ),
-    Email(
-      sender: "Olenna Mason",
-      subject: "Lakestone student art exhibition",
-      body: "You're invited to Lakestone's annual stu...",
-      time: "Jun 21",
+      sender: "Email with Attachment",
+      subject: "Lorem ipsum dolor sit amet",
+      body: "Consectetur adipiscing elit. Aenean.",
+      time: "8:00 AM",
       isRead: false,
       avatarColor: Colors.lightBlue,
+      hasAttachment: true,
     ),
     Email(
-      sender: "Merced Flores",
-      subject: "Re: consultant for book",
-      body: "Hi Julia, I'm absolutely avail...",
-      time: "Jun 21",
+      sender: "Email with Multiple Attachments",
+      subject: "Lorem ipsum dolor sit amet",
+      body: "Consectetur adipiscing elit. Aenean.",
+      time: "8:00 AM",
       isRead: false,
-      avatarColor: Colors.orange,
+      avatarColor: Colors.purple,
+      hasAttachment: true,
+      attachmentCount: 2,
     ),
     Email(
-      sender: "Elena Casarosa",
-      subject: "Portrait special",
-      body: "Just wanted to let you know...",
-      time: "Jun 21",
+      sender: "With reply, me 10",
+      subject: "Lorem ipsum dolor sit amet",
+      body: "Consectetur adipiscing elit. Aenean.",
+      time: "8:00 AM",
       isRead: false,
       avatarColor: Colors.lightBlue,
     ),
@@ -82,16 +69,13 @@ class GmailHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Primary'),
+        title: Text('Search in mail'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: EmailSearchDelegate(emails),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              child: Text('B'),
+            ),
           ),
         ],
       ),
@@ -138,15 +122,33 @@ class GmailHomePage extends StatelessWidget {
           return EmailListItem(email: emails[index]);
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ComposeEmailPage()),
           );
         },
-        tooltip: 'Compose',
-        child: Icon(Icons.edit),
+        label: Text('Compose'),
+        icon: Icon(Icons.edit),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.mail),
+            label: 'Mail',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'People',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.video_call),
+            label: 'Meet',
+          ),
+        ],
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
       ),
     );
   }
@@ -159,6 +161,8 @@ class Email {
   final String time;
   final bool isRead;
   final Color avatarColor;
+  final bool hasAttachment;
+  final int attachmentCount;
 
   Email({
     required this.sender,
@@ -167,6 +171,8 @@ class Email {
     required this.time,
     required this.isRead,
     required this.avatarColor,
+    this.hasAttachment = false,
+    this.attachmentCount = 0,
   });
 }
 
@@ -200,6 +206,16 @@ class EmailListItem extends StatelessWidget {
               fontWeight: email.isRead ? FontWeight.normal : FontWeight.bold,
             ),
           ),
+          if (email.hasAttachment)
+            Row(
+              children: [
+                Icon(Icons.attachment),
+                Text('Image_file.png'),
+                if (email.attachmentCount > 1) ...[
+                  Text(' +${email.attachmentCount - 1}'),
+                ],
+              ],
+            ),
           Text(email.body),
         ],
       ),
@@ -303,7 +319,6 @@ class ComposeEmailPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle send email
               },
               child: Text('Send'),
             ),
@@ -314,60 +329,3 @@ class ComposeEmailPage extends StatelessWidget {
   }
 }
 
-class EmailSearchDelegate extends SearchDelegate<Email> {
-  final List<Email> emails;
-
-  EmailSearchDelegate(this.emails);
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-        },
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-        close(context, null);
-      },
-    );
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    final results = emails.where((email) {
-      return email.subject.toLowerCase().contains(query.toLowerCase()) ||
-          email.sender.toLowerCase().contains(query.toLowerCase());
-    }).toList();
-
-    return ListView.builder(
-      itemCount: results.length,
-      itemBuilder: (context, index) {
-        return EmailListItem(email: results[index]);
-      },
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    final suggestions = emails.where((email) {
-      return email.subject.toLowerCase().contains(query.toLowerCase()) ||
-          email.sender.toLowerCase().contains(query.toLowerCase());
-    }).toList();
-
-    return ListView.builder(
-      itemCount: suggestions.length,
-      itemBuilder: (context, index) {
-        return EmailListItem(email: suggestions[index]);
-      },
-    );
-  }
-}
